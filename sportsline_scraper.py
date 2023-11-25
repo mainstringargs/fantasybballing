@@ -31,7 +31,7 @@ def scrape_and_save_data(base_url, output_folder, sport):
     table_locator = (By.TAG_NAME, 'table')
 
     # Wait for the presence of the table
-    table = WebDriverWait(driver, 20).until(
+    table = WebDriverWait(driver, 5).until(
         EC.presence_of_element_located(table_locator)
     )
 
@@ -68,24 +68,38 @@ def scrape_and_save_data(base_url, output_folder, sport):
     # Create a folder for the output if it doesn't exist
     if not os.path.exists(output_folder):
         os.makedirs(output_folder)
+        
+    #'Name','Position','Team','Projection'
+
+    df = df.rename(columns={"PLAYER": "Name", "POS": "Position", "TEAM": "Team", "FP": "Projection"})
+   # df.rename(columns={"PLAYER": "Name", "POS": "pos", "TEAM": "Team", "DK": "Projection"})
+   # df.rename(columns={"PLAYER": "Name", "POS": "Position", "TEAM": "Team", "FD": "Projection"})  
+
+    df = df.loc[:, ['Name', 'Position', 'Team', 'Projection']]
+    df['Projection'] = df['Projection'].astype(float)
 
     # Generate a filename with the current date
-    current_datetime = time.strftime("%Y-%m-%d_%H%M%S")
-    file_name = os.path.join(output_folder, f"{sport}_data_{current_datetime}.csv")
+   # current_datetime = time.strftime("%Y-%m-%d_%H%M%S")
+  #  file_name = os.path.join(output_folder, f"{sport}_data_{current_datetime}.csv")
 
     # Save the data to a CSV file
-    df.to_csv(file_name, index=False)
+    #df.to_csv(file_name, index=False)
 
     # Close the browser
     driver.quit()
     
+    return df;
     
-# URLs and output folder
-nba_url = "aHR0cHM6Ly93d3cuc3BvcnRzbGluZS5jb20vbmJhL2V4cGVydC1wcm9qZWN0aW9ucy9zaW11bGF0aW9uLw=="
 
-output_folder = "nba_predictions"
+def getProjections():
 
-# Scraping and saving data for NBA, MLB, and NFL
-scrape_and_save_data(nba_url, output_folder, "NBA")
+
+    # URLs and output folder
+    nba_url = "aHR0cHM6Ly93d3cuc3BvcnRzbGluZS5jb20vbmJhL2V4cGVydC1wcm9qZWN0aW9ucy9zaW11bGF0aW9uLw=="
+
+    output_folder = "nba_predictions"
+
+    # Scraping and saving data for NBA, MLB, and NFL
+    return scrape_and_save_data(nba_url, output_folder, "NBA")
 
 
