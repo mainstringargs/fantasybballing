@@ -71,12 +71,14 @@ def scrape_and_save_data(base_url, output_folder, sport):
         
     #'Name','Position','Team','Projection'
 
-    df = df.rename(columns={"PLAYER": "Name", "POS": "Position", "TEAM": "Team", "FP": "Projection"})
-   # df.rename(columns={"PLAYER": "Name", "POS": "pos", "TEAM": "Team", "DK": "Projection"})
+   # df = df.rename(columns={"PLAYER": "Name", "POS": "Position", "TEAM": "Team", "FP": "Projection"})
+    df = df.rename(columns={"PLAYER": "Name", "POS": "Position", "TEAM": "Team", "DK": "Projection"})
    # df.rename(columns={"PLAYER": "Name", "POS": "Position", "TEAM": "Team", "FD": "Projection"})  
 
     df = df.loc[:, ['Name', 'Position', 'Team', 'Projection']]
     df['Projection'] = df['Projection'].astype(float)
+
+    df = df.sort_values(by=['Projection'], ascending=False)
 
     # Generate a filename with the current date
    # current_datetime = time.strftime("%Y-%m-%d_%H%M%S")
