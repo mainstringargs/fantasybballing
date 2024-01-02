@@ -60,7 +60,7 @@ for contest in contests.contests:
     section = section_of_day(central.hour)
  #   if 'in-game' in contest.name.lower() and contest.entries_details.maximum > 500 and contest.entries_details.fee==.25 and weekday.lower() in sys.argv[1].strip().lower() and section.lower() in sys.argv[2].strip().lower():
 
-    if 'showdown' in contest.name.lower() and 'top 20' not in contest.name.lower() and 'satellite' not in contest.name.lower() and 'winner takes all' not in contest.name.lower() and contest.entries_details.maximum > 100 and contest.entries_details.fee==1.00 and weekday.lower() in sys.argv[1].strip().lower() and section.lower() in sys.argv[2].strip().lower():
+    if 'showdown' in contest.name.lower() and contest.entries_details.fee<2 and 'top 20' not in contest.name.lower() and 'top 15' not in contest.name.lower() and 'top 10' not in contest.name.lower() and 'satellite' not in contest.name.lower() and 'winner takes all' not in contest.name.lower() and weekday.lower() in sys.argv[1].strip().lower() and section.lower() in sys.argv[2].strip().lower():
         print(central)
         print(contest)
         print(weekday,section)
