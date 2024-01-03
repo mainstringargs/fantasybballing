@@ -1,13 +1,15 @@
 import sportsline_scraper
+import rotowire_scraper
 import pandas
 import draft_kings
 import sys
 from datetime import datetime
 from dateutil import tz
-
+import rotowire_scraper
 from pydfs_lineup_optimizer import get_optimizer, Site, Sport
 
-
+import traceback
+import sys
 import csv
 import os, glob
 
@@ -38,7 +40,8 @@ def gen_pydfs(in_filename,out_filename):
         print(lineup)
     optimizer.export(out_filename)
 
-nba_projections = sportsline_scraper.getProjections();
+#nba_projections = sportsline_scraper.getProjections();
+nba_projections = rotowire_scraper.getProjections();
 
 newpath = 'results'
 if not os.path.exists(newpath):
@@ -92,24 +95,20 @@ for contest in contests.contests:
         if not os.path.exists(newpath):
             os.makedirs(newpath)
 
-        gen_pydfs(dk_df_merged_file,newpath+'/pydfs_result.csv')
+        try:
+            gen_pydfs(dk_df_merged_file, newpath + '/pydfs_result.csv')
 
-        extension = 'csv'
-        all_filenames = [i for i in glob.glob('temp/*.{}'.format(extension))]
-
-        combined_csv = pandas.concat([pandas.read_csv(f) for f in all_filenames ])
-
-        now = datetime.now().strftime("%Y%m%d-%H%M%S")
-        combined_csv = combined_csv.fillna('pydfs')
-        combined_csv = combined_csv.sort_values('FPPG',ascending=False)
-        #export to csv
-        combined_csv.to_csv( "results/nba_combined_results_"+teams+"_"+LOGDATE+"_"+now+"_"+str(contest.entries_details.maximum)+".csv", index=False, encoding='utf-8-sig',header=['CPT','UTIL','UTIL','UTIL','UTIL','UTIL','Budget','FPPG'])
-
-        #print(combined_csv)
-
-
-
-
-        
-
-
+            extension = 'csv'
+            all_filenames = [i for i in glob.glob('temp/*.{}'.format(extension))]
+    
+            combined_csv = pandas.concat([pandas.read_csv(f) for f in all_filenames])
+    
+            now = datetime.now().strftime("%Y%m%d-%H%M%S")
+            combined_csv = combined_csv.fillna('pydfs')
+            combined_csv = combined_csv.sort_values('FPPG', ascending=False)
+            # export to csv
+            combined_csv.to_csv("results/nba_combined_results_" + teams + "_" + LOGDATE + "_" + now + "_" + str(
+                contest.entries_details.maximum) + ".csv", index=False, encoding='utf-8-sig',
+                                header=['CPT', 'UTIL', 'UTIL', 'UTIL', 'UTIL', 'UTIL', 'Budget', 'FPPG'])
+        except Exception:
+            print(traceback.format_exc())
