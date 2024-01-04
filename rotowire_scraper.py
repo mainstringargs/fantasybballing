@@ -1,17 +1,11 @@
-import time
-from seleniumwire import webdriver
-from selenium.webdriver.common.by import By
-from selenium.webdriver.common.keys import Keys
-from selenium.webdriver.support.ui import WebDriverWait
-from selenium.webdriver.support import expected_conditions as EC
-import pandas as pd
-import os
 import base64;
 import json
 
+import pandas as pd
 from selenium.webdriver.common.by import By
-from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
+from selenium.webdriver.support.ui import WebDriverWait
+from seleniumwire import webdriver
 
 
 def remove_name_extension(name):
@@ -19,19 +13,19 @@ def remove_name_extension(name):
     Remove specific name extensions from a given name.
     """
     suffixes_to_remove = ["Jr.", "Sr.", "II", "III", "IV", "Ph.D."]  # Add more suffixes if needed
-    cleaned_name = name.replace("'","").replace("-","")
+    cleaned_name = name.replace("'", "").replace("-", "")
     for suffix in suffixes_to_remove:
         cleaned_name = cleaned_name.replace(suffix, "").strip()
     return cleaned_name
 
-# Function to scrape and save data
-def scrape_and_save_data(base_url, output_folder, sport):
 
+# Function to scrape and save data
+def scrape_and_save_data(base_url):
     # Set up the web driver (make sure to specify the path to your browser driver)
     driver = webdriver.Chrome()
 
     decoded_url = base64.b64decode(base_url).decode()
-    print("Opening URL",decoded_url)
+    print("Opening URL", decoded_url)
     # Open the initial page
     driver.get(decoded_url)
 
@@ -75,23 +69,18 @@ def scrape_and_save_data(base_url, output_folder, sport):
 
                 for d in data:
                     if d['injuryStatus'] != 'OUT':
-                        name = remove_name_extension(d['firstName'] + " "+d['lastName'])
+                        name = remove_name_extension(d['firstName'] + " " + d['lastName'])
                         pos = d['rotoPos']
                         team = d['team']['abbr']
                         fp_proj = float(d['pts'])
-                        print(name,pos,team,fp_proj,flush=True)
-                        player = {"PLAYER":name, "POS":pos, "TEAM":team, "FP": fp_proj}
+                        print(name, pos, team, fp_proj, flush=True)
+                        player = {"PLAYER": name, "POS": pos, "TEAM": team, "FP": fp_proj}
                         dfdata.append(player)
 
             except json.JSONDecodeError:
                 print("The extracted text is not valid JSON.")
 
-
     df = pd.DataFrame(dfdata)
-
-    # Create a folder for the output if it doesn't exist
-    if not os.path.exists(output_folder):
-        os.makedirs(output_folder)
 
     df = df.rename(columns={"PLAYER": "Name", "POS": "Position", "TEAM": "Team", "FP": "Projection"})
 
@@ -100,19 +89,13 @@ def scrape_and_save_data(base_url, output_folder, sport):
     df = df.sort_values(by=['Projection'], ascending=False)
     # Close the browser
     driver.quit()
-    
+
     return df;
-    
-
-def getProjections():
 
 
+def get_projections():
     # URLs and output folder
     nba_url = "aHR0cHM6Ly93d3cucm90b3dpcmUuY29tL2RhaWx5L25iYS9vcHRpbWl6ZXIucGhw="
 
-    output_folder = "nba_predictions"
-
     # Scraping and saving data for NBA, MLB, and NFL
-    return scrape_and_save_data(nba_url, output_folder, "NBA")
-
-
+    return scrape_and_save_data(nba_url)
